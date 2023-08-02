@@ -1,0 +1,49 @@
+import openpyxl
+
+wb = openpyxl.load_workbook('D:\pig.xlsx')
+sheet = wb.active
+colvo = {}
+for cell in sheet['B']:
+    if cell.value not in colvo:
+        colvo[cell.value]=1
+    elif cell.value in colvo:
+        colvo[cell.value]+=1
+    print(cell.value)
+print(colvo)
+temp = {}
+
+for i in colvo:
+    if colvo[i]>1:
+       for cell in sheet['B']:
+           if cell.value == i:
+               temp.setdefault(i, [])
+               row = cell.row
+               column = cell.column
+               temp[i].append(sheet[row][6].value)
+
+print(temp)
+for i in temp:
+    schet_cop = len(temp[i])
+    for j in range(len(temp[i])):
+        schet = 0
+
+        if 'Оригинал' in temp[i]:
+            for row in sheet:
+                for cell in row:
+                    if cell.value == i and sheet[cell.row][6].value == 'Копия':
+                        sheet.delete_rows(cell.row)
+                    elif cell.value == i and sheet[cell.row][6].value == 'Оригинал' and schet==0:
+                        schet+=1
+                    elif cell.value == i and sheet[cell.row][6].value == 'Оригинал' and schet != 0:
+                        sheet.delete_rows(cell.row)
+        if 'Оригинал' not in temp[i]:
+
+            for row in sheet:
+                for cell in row:
+                    if cell.value == i and sheet[cell.row][6].value == 'Копия' and schet_cop != 1:
+                        sheet.delete_rows(cell.row)
+                        schet_cop-=1
+                        print(schet_cop)
+
+
+wb.save('D:\pig.xlsx')
